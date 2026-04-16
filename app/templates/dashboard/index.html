@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row fade-in-up">
+    <div class="col-12 mb-4">
+        <h2 class="text-gradient mb-3">學習主控台</h2>
+        <p>歡迎回來，{{ session.get('username') }}！準備好今天的挑戰了嗎？</p>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="glass-panel glass-panel-hover h-100 text-center">
+            <div class="display-4 text-primary mb-3"><i class="bi bi-journal-code"></i></div>
+            <h3 class="h4">科目總數</h3>
+            <p class="display-5 fw-bold text-white mb-0">{{ subjects|length }}</p>
+            <a href="{{ url_for('subjects.index') }}" class="btn btn-outline-primary glass-btn mt-3 btn-sm px-4">管理科目</a>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="glass-panel glass-panel-hover h-100 text-center">
+            <div class="display-4 text-warning mb-3"><i class="bi bi-clipboard2-x"></i></div>
+            <h3 class="h4">弱點分析</h3>
+            <p class="mb-0">追蹤你在歷次測驗中容易答錯的題型。</p>
+            <a href="{{ url_for('dashboard.weaknesses') }}" class="btn btn-outline-warning glass-btn mt-3 btn-sm px-4">查看錯題本</a>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="glass-panel glass-panel-hover h-100 text-center">
+            <div class="display-4 text-success mb-3"><i class="bi bi-mic"></i></div>
+            <h3 class="h4">即時解惑</h3>
+            <p class="mb-0">隨時用語音問答來解決當下遇到的學習瓶頸。</p>
+            <a href="{{ url_for('voice.qa_page') }}" class="btn btn-outline-success glass-btn mt-3 btn-sm px-4">去對話</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

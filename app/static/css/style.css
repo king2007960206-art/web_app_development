@@ -1,0 +1,159 @@
+/* Custom Premium Glassmorphic Design */
+:root {
+    --bg-color: #0f172a;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-glow: rgba(99, 102, 241, 0.4);
+    --glass-bg: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    background-image: 
+        radial-gradient(ellipse at 15% 10%, rgba(99, 102, 241, 0.15) 0px, transparent 60%),
+        radial-gradient(ellipse at 85% 90%, rgba(6, 182, 212, 0.15) 0px, transparent 60%);
+    background-attachment: fixed;
+}
+
+/* Glassmorphism Containers */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-panel-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px -5px var(--accent-glow);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Nav & Footer */
+.glass-nav {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+}
+.glass-footer {
+    background: rgba(15, 23, 42, 0.3);
+    border-top: 1px solid var(--glass-border);
+}
+
+/* Gradients */
+.text-gradient {
+    background: linear-gradient(135deg, #818cf8, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5 { 
+    font-weight: 800; 
+    letter-spacing: -0.02em; 
+    color: #fff;
+}
+p, span, label {
+    color: var(--text-secondary);
+}
+
+/* Buttons */
+.glass-btn-primary {
+    background: linear-gradient(135deg, #6366f1, #3b82f6);
+    border: none;
+    color: #fff !important;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+.glass-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+    background: linear-gradient(135deg, #4f46e5, #2563eb);
+}
+
+.glass-btn {
+    border-radius: 50px;
+    backdrop-filter: blur(4px);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.glass-btn:hover {
+    transform: translateY(-2px);
+}
+
+.glass-btn-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Forms */
+.glass-input {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: #fff !important;
+    border-radius: 12px;
+    padding: 0.8rem 1.2rem;
+    transition: all 0.3s ease;
+    font-weight: 400;
+}
+.glass-input::placeholder {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+.glass-input:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+    border-color: #818cf8 !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: #cbd5e1;
+}
+
+/* Alert Styling */
+.glass-alert {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 600;
+}
+.alert-danger.glass-alert { border-left: 4px solid #ef4444; }
+.alert-success.glass-alert { border-left: 4px solid #10b981; }
+.alert-warning.glass-alert { border-left: 4px solid #f59e0b; }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+/* Animation Utils */
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

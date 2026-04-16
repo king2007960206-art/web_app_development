@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center align-items-center mt-5 fade-in-up">
+    <div class="col-md-6 col-lg-5">
+        <div class="glass-panel p-5">
+            <div class="text-center mb-4">
+                <h1 class="h2 fw-bold text-gradient mb-2">歡迎回來</h1>
+                <p>登入帳戶，繼續你的學習旅程</p>
+            </div>
+            
+            <form action="{{ url_for('auth.login') }}" method="POST">
+                <div class="mb-4">
+                    <label for="email" class="form-label">電子信箱</label>
+                    <input type="email" class="form-control glass-input" id="email" name="email" placeholder="name@example.com" required>
+                </div>
+                
+                <div class="mb-5">
+                    <label for="password" class="form-label">會員密碼</label>
+                    <input type="password" class="form-control glass-input" id="password" name="password" placeholder="輸入密碼" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary glass-btn-primary w-100 py-3 fs-5 mb-4">登入帳號</button>
+                
+                <div class="text-center">
+                    <p class="mb-0">還沒有帳號嗎？ <a href="{{ url_for('auth.register') }}" class="text-info text-decoration-none fw-bold">免費註冊</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

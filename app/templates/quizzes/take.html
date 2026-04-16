@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center fade-in-up">
+    <div class="col-lg-10">
+        <div class="glass-panel p-md-5">
+            <div class="text-center mb-5 border-bottom border-secondary pb-4">
+                <h2 class="text-gradient mb-2">{{ quiz.title }}</h2>
+                <p class="text-secondary fs-5">請仔細選出最適當的答案，完成後點擊提交。</p>
+            </div>
+            
+            <form action="{{ url_for('quizzes.submit_quiz', quiz_id=quiz.id) }}" method="POST">
+                {% for q in quiz.questions %}
+                <div class="mb-5 p-4 rounded glass-panel" style="background: rgba(255,255,255,0.02); box-shadow: none;">
+                    <h4 class="text-white mb-4"><span class="text-info fw-bold me-2">Q{{ loop.index }}.</span> {{ q.question_text }}</h4>
+                    
+                    <div class="mb-3">
+                        <label for="q_{{ q.id }}" class="form-label text-muted ms-2">你的解答：</label>
+                        <input type="text" class="form-control glass-input fs-5" id="q_{{ q.id }}" name="q_{{ q.id }}" placeholder="請輸入答案或選項" required autocomplete="off">
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <div class="text-center mt-5 pt-3">
+                    <button type="submit" class="btn btn-primary glass-btn-primary btn-lg px-5 shadow text-white" onclick="return confirm('確定要交卷了嗎？');">
+                        <i class="bi bi-send-check"></i> 確認交卷
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

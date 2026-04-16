@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center fade-in-up">
+    <div class="col-md-10 col-lg-8 mt-3">
+        <div class="glass-panel">
+            <div class="mb-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2">
+                        <li class="breadcrumb-item"><a href="{{ url_for('subjects.index') }}" class="text-info text-decoration-none">{{ subject.name }}</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('notes.list_notes', subject_id=subject.id) }}" class="text-info text-decoration-none">筆記庫</a></li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">新增</li>
+                    </ol>
+                </nav>
+                <h2 class="text-white h3 mb-2">讓 AI 為你整理講義</h2>
+                <p class="text-secondary">輸入長文講義、投影片提綱或任何學習資料，AI 將自動提煉成大綱與重點。</p>
+            </div>
+            
+            <form action="{{ url_for('notes.upload_note', subject_id=subject.id) }}" method="POST" id="uploadForm">
+                <div class="mb-4">
+                    <label for="title" class="form-label">筆記標題 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control glass-input" id="title" name="title" placeholder="章節名稱或主題，例如：第三章 熱力學定律" required>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="content" class="form-label">貼上原始文字內容 <span class="text-danger">*</span></label>
+                    <textarea class="form-control glass-input font-monospace text-muted" id="content" name="content" rows="12" placeholder="請將純文字或講義複製貼上於此..." required></textarea>
+                </div>
+                
+                <div class="d-flex justify-content-end gap-3 mt-4 pt-2">
+                    <a href="{{ url_for('notes.list_notes', subject_id=subject.id) }}" class="btn btn-outline-secondary glass-btn px-4 py-2">取消</a>
+                    <button type="submit" class="btn btn-primary glass-btn-primary px-5 py-2" id="submitBtn">
+                        <span class="spinner-border spinner-border-sm d-none me-2" role="status" aria-hidden="true" id="submitSpinner"></span>
+                        <span id="submitText"><i class="bi bi-stars"></i> 開始 AI 精煉</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('uploadForm').addEventListener('submit', function() {
+    const btn = document.getElementById('submitBtn');
+    const spinner = document.getElementById('submitSpinner');
+    const text = document.getElementById('submitText');
+    btn.classList.add('disabled');
+    spinner.classList.remove('d-none');
+    text.textContent = 'AI 教練正在解析中...';
+});
+</script>
+{% endblock %}

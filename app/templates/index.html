@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row align-items-center min-vh-75 min-vh-md-75 py-5 fade-in-up">
+    <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
+        <h1 class="display-3 fw-bold mb-4">
+            重塑你的<br>
+            <span class="text-gradient">學習體驗</span>
+        </h1>
+        <p class="lead mb-4 fw-normal" style="font-size: 1.25rem;">
+            使用最先進的 AI 語言模型，自動將冗長的講義轉換為結構化筆記、即時產出測驗題，還有全天候的專屬語音家教陪你攻克每一個盲點。
+        </p>
+        <div class="d-flex gap-3 justify-content-center justify-content-lg-start mt-5">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary glass-btn-primary btn-lg px-5 py-3 fs-5">
+                免費開始探索 <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light glass-btn btn-lg px-5 py-3 fs-5">
+                登入帳號
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="row g-4">
+            <div class="col-sm-6">
+                <div class="glass-panel glass-panel-hover text-center h-100">
+                    <div class="display-4 mb-3 text-info"><i class="bi bi-file-earmark-text"></i></div>
+                    <h3 class="h4">一鍵摘要筆記</h3>
+                    <p class="mb-0 fs-6">上傳繁雜講義，AI 自動分析重點生成邏輯清晰的筆記。</p>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="glass-panel glass-panel-hover text-center h-100" style="margin-top: 2rem;">
+                    <div class="display-4 mb-3 text-warning"><i class="bi bi-ui-checks"></i></div>
+                    <h3 class="h4">動態產生測驗</h3>
+                    <p class="mb-0 fs-6">根據筆記自動出題，抓取理解盲點，並收錄於錯題本中分析弱點。</p>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="glass-panel glass-panel-hover text-center h-100">
+                    <div class="display-4 mb-3 text-success"><i class="bi bi-mic"></i></div>
+                    <h3 class="h4">AI 語音解惑</h3>
+                    <p class="mb-0 fs-6">支援語音問答，宛如家教隨側在旁，隨時開口提問即時解答。</p>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="glass-panel glass-panel-hover text-center h-100" style="margin-top: 2rem;">
+                    <div class="display-4 mb-3 text-purple" style="color: #c084fc;"><i class="bi bi-graph-up-arrow"></i></div>
+                    <h3 class="h4">成效數據追蹤</h3>
+                    <p class="mb-0 fs-6">詳實記錄每日學習進度，視覺化你的成長歷程。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
