@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.models.user import User
+from app.models.account import Account
+from app.models.category import Category
 from werkzeug.security import generate_password_hash, check_password_hash
 
 auth_bp = Blueprint('auth', __name__)
@@ -30,6 +32,14 @@ def login():
             # 找不到帳號，為了測試方便，直接幫他註冊
             hashed_pw = generate_password_hash(password)
             new_user = User.create(username=username, password_hash=hashed_pw)
+            
+            # 自動建立預設的現金帳戶與常見分類，以便可以立刻記帳
+            Account.create(user_id=new_user.id, name="現金錢包", type="cash", balance=0.0)
+            Category.create(name="餐飲", type="expense", user_id=new_user.id, icon="bi-cup-hot")
+            Category.create(name="交通", type="expense", user_id=new_user.id, icon="bi-car-front")
+            Category.create(name="購物", type="expense", user_id=new_user.id, icon="bi-bag")
+            Category.create(name="薪資", type="income", user_id=new_user.id, icon="bi-cash-coin")
+
             session['user_id'] = new_user.id
             flash('找不到此帳號，已自動為您註冊並登入！', 'success')
             return redirect(url_for('dashboard.index'))

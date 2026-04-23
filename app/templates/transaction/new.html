@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-white border-0 pt-4 pb-0 text-center">
+                <h4 class="fw-bold"><i class="bi bi-pencil-square text-primary"></i> 快速記帳</h4>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ url_for('transaction.create_transaction') }}" method="POST">
+                    
+                    <!-- 收支切換 (Radio Buttons) -->
+                    <div class="btn-group w-100 mb-4" role="group">
+                        <input type="radio" class="btn-check" name="tx_type" id="type_expense" value="expense" checked onchange="toggleCategories()">
+                        <label class="btn btn-outline-danger" for="type_expense">支出</label>
+                      
+                        <input type="radio" class="btn-check" name="tx_type" id="type_income" value="income" onchange="toggleCategories()">
+                        <label class="btn btn-outline-success" for="type_income">收入</label>
+                    </div>
+
+                    <!-- 日期 -->
+                    <div class="mb-3">
+                        <label for="transaction_date" class="form-label text-muted small">日期</label>
+                        <input type="date" class="form-control form-control-lg" id="transaction_date" name="transaction_date" value="{{ today }}" required>
+                    </div>
+
+                    <!-- 帳戶選擇 -->
+                    <div class="mb-3">
+                        <label for="account_id" class="form-label text-muted small">帳戶</label>
+                        <select class="form-select form-select-lg" id="account_id" name="account_id" required>
+                            {% for acc in accounts %}
+                                <option value="{{ acc.id }}">{{ acc.name }} (${{ "{:,.0f}".format(acc.balance) }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- 分類選擇 -->
+                    <div class="mb-3">
+                        <label for="category_id" class="form-label text-muted small">分類</label>
+                        <select class="form-select form-select-lg" id="category_id" name="category_id" required>
+                            <!-- 選項將由 JavaScript 動態填入 -->
+                        </select>
+                    </div>
+
+                    <!-- 金額 -->
+                    <div class="mb-3">
+                        <label for="amount" class="form-label text-muted small">金額</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control fw-bold" id="amount" name="amount" min="1" step="0.01" placeholder="0" required autofocus>
+                        </div>
+                    </div>
+
+                    <!-- 備註 -->
+                    <div class="mb-4">
+                        <label for="note" class="form-label text-muted small">備註 (選填)</label>
+                        <input type="text" class="form-control" id="note" name="note" placeholder="例如：午餐便當...">
+                    </div>
+
+                    <!-- 送出按鈕 -->
+                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm">
+                        完成記帳
+                    </button>
+                    
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('dashboard.index') }}" class="text-decoration-none text-muted">取消並返回首頁</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 準備好收入與支出的分類資料
+    const expenseCategories = [
+        {% for cat in expense_categories %}
+            { id: {{ cat.id }}, name: "{{ cat.name }}" }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    const incomeCategories = [
+        {% for cat in income_categories %}
+            { id: {{ cat.id }}, name: "{{ cat.name }}" }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    function toggleCategories() {
+        const typeExpense = document.getElementById('type_expense').checked;
+        const categorySelect = document.getElementById('category_id');
+        
+        // 清空目前的選項
+        categorySelect.innerHTML = '';
+        
+        // 根據選中的收支類型決定要顯示的分類
+        const targetList = typeExpense ? expenseCategories : incomeCategories;
+        
+        if (targetList.length === 0) {
+            const option = document.createElement('option');
+            option.value = "";
+            option.text = "無可用分類";
+            categorySelect.appendChild(option);
+            return;
+        }
+
+        // 填入新選項
+        targetList.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.id;
+            option.text = cat.name;
+            categorySelect.appendChild(option);
+        });
+    }
+
+    // 頁面載入時執行一次初始化
+    document.addEventListener('DOMContentLoaded', toggleCategories);
+</script>
+{% endblock %}
