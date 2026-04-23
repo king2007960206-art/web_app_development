@@ -1,77 +1,74 @@
 <!DOCTYPE html>
-<html lang="zh-TW" data-bs-theme="dark">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 學習助理</title>
-    <!-- Google Fonts: Outfit -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <!-- Bootstrap CSS for grid system & structure -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Custom Vanilla CSS for Premium Glassmorphic Aesthetic -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>個人記帳簿</title>
+    <!-- 引入 Bootstrap 5 (清爽簡約風) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,.05);
+        }
+    </style>
 </head>
 <body>
-    <div class="app-container d-flex flex-column min-vh-100">
-        <!-- 導覽列 -->
-        <nav class="navbar navbar-expand-lg glass-nav mb-4">
-            <div class="container">
-                <a class="navbar-brand fw-bold text-gradient fs-4" href="{{ url_for('index') }}">
-                    <i class="bi bi-robot"></i> AI 學習助理
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto align-items-center fw-semibold">
-                        {% if session.get('user_id') %}
-                            <li class="nav-item"><a class="nav-link px-3" href="{{ url_for('dashboard.index') }}">總覽</a></li>
-                            <li class="nav-item"><a class="nav-link px-3" href="{{ url_for('subjects.index') }}">我的科目</a></li>
-                            <li class="nav-item"><a class="nav-link px-3" href="{{ url_for('voice.qa_page') }}">💬 語音問答</a></li>
-                            <li class="nav-item ms-3">
-                                <a class="btn btn-outline-light btn-sm glass-btn px-4" href="{{ url_for('auth.logout') }}">登出</a>
-                            </li>
-                        {% else %}
-                            <li class="nav-item"><a class="nav-link px-3" href="{{ url_for('auth.login') }}">登入</a></li>
-                            <li class="nav-item ms-2">
-                                <a class="btn btn-primary glass-btn-primary px-4" href="{{ url_for('auth.register') }}">註冊</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </nav>
 
-        <!-- Flash Messages -->
+    <!-- 導覽列 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4">
         <div class="container">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <!-- category maps directly, except error maps to danger for bootstrap colors -->
-                        <div class="alert alert-{{ 'danger' if category == 'error' else (category if category in ['success', 'warning', 'info'] else 'primary') }} alert-dismissible fade show glass-alert" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
+            <a class="navbar-brand fw-bold text-primary" href="{{ url_for('dashboard.index') }}">
+                <i class="bi bi-wallet2"></i> 記帳簿
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                {% if session.get('user_id') %}
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard.index') }}">首頁</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('transaction.new_transaction') }}">快速記帳</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('transaction.list_transactions') }}">歷史明細</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">登出</a>
+                    </li>
+                </ul>
                 {% endif %}
-            {% endwith %}
-        </div>
-
-        <!-- 主內容區塊 -->
-        <main class="container flex-grow-1 py-3 mb-5">
-            {% block content %}{% endblock %}
-        </main>
-        
-        <footer class="mt-auto py-4 glass-footer text-center">
-            <div class="container text-muted">
-                <small class="fw-semibold">&copy; 2026 AI 學習助理平台. Powered by Generative AI.</small>
             </div>
-        </footer>
+        </div>
+    </nav>
+
+    <!-- 主要內容區 -->
+    <div class="container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- 子頁面內容插入處 -->
+        {% block content %}{% endblock %}
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    {% block scripts %}{% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,35 +1,71 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="row fade-in-up">
-    <div class="col-12 mb-4">
-        <h2 class="text-gradient mb-3">學習主控台</h2>
-        <p>歡迎回來，{{ session.get('username') }}！準備好今天的挑戰了嗎？</p>
+<div class="row mb-4">
+    <div class="col-12 text-center">
+        <h5 class="text-muted">總資產淨值</h5>
+        <h1 class="display-3 fw-bold text-primary mb-4">
+            ${{ "{:,.2f}".format(total_net_worth) if total_net_worth else "0.00" }}
+        </h1>
+        <a href="{{ url_for('transaction.new_transaction') }}" class="btn btn-success btn-lg px-5 shadow rounded-pill">
+            <i class="bi bi-plus-lg"></i> 快速記帳
+        </a>
     </div>
-    
-    <div class="col-md-4 mb-4">
-        <div class="glass-panel glass-panel-hover h-100 text-center">
-            <div class="display-4 text-primary mb-3"><i class="bi bi-journal-code"></i></div>
-            <h3 class="h4">科目總數</h3>
-            <p class="display-5 fw-bold text-white mb-0">{{ subjects|length }}</p>
-            <a href="{{ url_for('subjects.index') }}" class="btn btn-outline-primary glass-btn mt-3 btn-sm px-4">管理科目</a>
+</div>
+
+<div class="row mt-5">
+    <!-- 左側：近期交易明細 -->
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-0 pt-4 pb-0">
+                <h5 class="fw-bold"><i class="bi bi-list-ul text-primary"></i> 近期交易明細</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_transactions %}
+                    <div class="list-group list-group-flush">
+                    {% for tx in recent_transactions %}
+                        <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ tx.category.name if tx.category else '無分類' }}</h6>
+                                <small class="text-muted">
+                                    {{ tx.transaction_date.strftime('%Y-%m-%d %H:%M') }} 
+                                    {% if tx.note %} · {{ tx.note }}{% endif %}
+                                </small>
+                            </div>
+                            <div class="fw-bold {% if tx.source_account_id %}text-danger{% else %}text-success{% endif %}">
+                                {% if tx.source_account_id %}-{% else %}+{% endif %}${{ "{:,.2f}".format(tx.amount) }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center my-4">目前還沒有任何交易紀錄喔！</p>
+                {% endif %}
+            </div>
         </div>
     </div>
-    
-    <div class="col-md-4 mb-4">
-        <div class="glass-panel glass-panel-hover h-100 text-center">
-            <div class="display-4 text-warning mb-3"><i class="bi bi-clipboard2-x"></i></div>
-            <h3 class="h4">弱點分析</h3>
-            <p class="mb-0">追蹤你在歷次測驗中容易答錯的題型。</p>
-            <a href="{{ url_for('dashboard.weaknesses') }}" class="btn btn-outline-warning glass-btn mt-3 btn-sm px-4">查看錯題本</a>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-4">
-        <div class="glass-panel glass-panel-hover h-100 text-center">
-            <div class="display-4 text-success mb-3"><i class="bi bi-mic"></i></div>
-            <h3 class="h4">即時解惑</h3>
-            <p class="mb-0">隨時用語音問答來解決當下遇到的學習瓶頸。</p>
-            <a href="{{ url_for('voice.qa_page') }}" class="btn btn-outline-success glass-btn mt-3 btn-sm px-4">去對話</a>
+
+    <!-- 右側：帳戶概況 -->
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold"><i class="bi bi-bank text-primary"></i> 我的帳戶</h5>
+                <a href="{{ url_for('settings.manage_accounts') }}" class="btn btn-sm btn-outline-secondary">管理</a>
+            </div>
+            <div class="card-body">
+                {% if accounts %}
+                    <ul class="list-group list-group-flush">
+                    {% for acc in accounts %}
+                        <li class="list-group-item px-0 d-flex justify-content-between align-items-center border-0">
+                            {{ acc.name }}
+                            <span class="badge bg-light text-dark rounded-pill">${{ "{:,.2f}".format(acc.balance) }}</span>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted text-center my-3">您尚未建立任何資金帳戶</p>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
