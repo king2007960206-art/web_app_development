@@ -1,80 +1,42 @@
-import logging
 from datetime import datetime
 from . import db
 
-logger = logging.getLogger(__name__)
-
 class User(db.Model):
-    __tablename__ = 'user'
-    
+    __tablename__ = 'users'
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256), nullable=False)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    subjects = db.relationship('Subject', backref='user', lazy=True)
-    
+
+    # Relationships
+    accounts = db.relationship('Account', backref='user', lazy=True, cascade='all, delete-orphan')
+    categories = db.relationship('Category', backref='user', lazy=True, cascade='all, delete-orphan')
+    transactions = db.relationship('Transaction', backref='user', lazy=True, cascade='all, delete-orphan')
+    budgets = db.relationship('Budget', backref='user', lazy=True, cascade='all, delete-orphan')
+    savings_goals = db.relationship('SavingsGoal', backref='user', lazy=True, cascade='all, delete-orphan')
+
     @classmethod
-    def create(cls, username, email, password_hash):
-        """新增一筆使用者記錄"""
-        try:
-            new_user = cls(username=username, email=email, password_hash=password_hash)
-            db.session.add(new_user)
-            db.session.commit()
-            return new_user
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"Error creating user: {e}")
-            return None
-            
-    @classmethod
-    def get_all(cls):
-        """取得所有使用者記錄"""
-        try:
-            return cls.query.all()
-        except Exception as e:
-            logger.error(f"Error getting all users: {e}")
-            return []
-            
+    def create(cls, username, password_hash):
+        user = cls(username=username, password_hash=password_hash)
+        db.session.add(user)
+        db.session.commit()
+        return user
+
     @classmethod
     def get_by_id(cls, user_id):
-        """取得單筆使用者記錄"""
-        try:
-            return cls.query.get(user_id)
-        except Exception as e:
-            logger.error(f"Error getting user by id: {e}")
-            return None
-            
+        return cls.query.get(user_id)
+
     @classmethod
-    def get_by_email(cls, email):
-        """透過信箱取得使用者記錄"""
-        try:
-            return cls.query.filter_by(email=email).first()
-        except Exception as e:
-            logger.error(f"Error getting user by email: {e}")
-            return None
-            
+    def get_by_username(cls, username):
+        return cls.query.filter_by(username=username).first()
+
     def update(self, **kwargs):
-        """更新使用者記錄"""
-        try:
-            for key, value in kwargs.items():
-                if hasattr(self, key):
-                    setattr(self, key, value)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"Error updating user: {e}")
-            return False
-            
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+        db.session.commit()
+        return self
+
     def delete(self):
-        """刪除使用者記錄"""
-        try:
-            db.session.delete(self)
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            logger.error(f"Error deleting user: {e}")
-            return False
+        db.session.delete(self)
+        db.session.commit()

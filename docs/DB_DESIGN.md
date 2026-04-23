@@ -1,104 +1,146 @@
-# 資料庫設計文件 - AI 學習助理平台
+# 資料庫設計 - 個人記帳簿系統
 
-基於產品需求文件 (PRD) 與流程圖 (FLOWCHART)，以下規劃本專案的 SQLite 資料庫 Schema 設計。根據架構文件，我們採用 Flask-SQLAlchemy 處理資料庫互動。
+本文件基於 PRD 與系統架構設計，定義了系統後端 SQLite 資料庫的 Schema，包含 ER 圖實體關聯模型與資料表欄位詳細說明。
+
+---
 
 ## 1. ER 圖（實體關係圖）
 
 ```mermaid
 erDiagram
-  USER {
+  users ||--o{ accounts : has
+  users ||--o{ categories : "customizes (optional)"
+  users ||--o{ transactions : logs
+  users ||--o{ budgets : sets
+  users ||--o{ savings_goals : creates
+
+  categories ||--o{ transactions : categorizes
+  categories ||--o{ budgets : "limits (optional)"
+  
+  accounts ||--o{ transactions : "source of (outflow)"
+  accounts ||--o{ transactions : "target of (inflow)"
+
+  users {
     int id PK
     string username
-    string email
     string password_hash
     datetime created_at
   }
-  
-  SUBJECT {
+
+  accounts {
     int id PK
     int user_id FK
     string name
-    string description
+    string type
+    float balance
+    string currency
     datetime created_at
-  }
-  
-  NOTE {
-    int id PK
-    int subject_id FK
-    string title
-    text original_content
-    text ai_summary
-    datetime created_at
-  }
-  
-  QUIZ {
-    int id PK
-    int subject_id FK
-    int note_id FK "nullable"
-    string title
-    int score
-    datetime created_at
-  }
-  
-  QUESTION_RESULT {
-    int id PK
-    int quiz_id FK
-    text question_text
-    string user_answer
-    string correct_answer
-    boolean is_correct
-    text explanation
   }
 
-  USER ||--o{ SUBJECT : "擁有"
-  SUBJECT ||--o{ NOTE : "包含"
-  SUBJECT ||--o{ QUIZ : "包含"
-  NOTE ||--o{ QUIZ : "衍生出"
-  QUIZ ||--o{ QUESTION_RESULT : "包含"
+  categories {
+    int id PK
+    int user_id FK "nullable for defaults"
+    string name
+    string type
+    string icon
+    boolean is_default
+    datetime created_at
+  }
+
+  transactions {
+    int id PK
+    int user_id FK
+    int category_id FK
+    int source_account_id FK "nullable"
+    int target_account_id FK "nullable"
+    float amount
+    string currency
+    string note
+    datetime transaction_date
+    string receipt_image_url "nullable"
+    datetime created_at
+  }
+
+  budgets {
+    int id PK
+    int user_id FK
+    int category_id FK "nullable for total budget"
+    float amount
+    string period_month
+    datetime created_at
+  }
+
+  savings_goals {
+    int id PK
+    int user_id FK
+    string name
+    float target_amount
+    float current_amount
+    date deadline_date
+    datetime created_at
+  }
 ```
+
+---
 
 ## 2. 資料表詳細說明
 
-### USER (使用者表)
-紀錄註冊使用者的基本資料與登入憑證。
-- `id` (INTEGER, PK): 使用者唯一 ID
-- `username` (VARCHAR(50)): 顯示名稱
-- `email` (VARCHAR(120)): 登入信箱 (必填, 唯一)
-- `password_hash` (VARCHAR(256)): 密碼雜湊值
-- `created_at` (DATETIME): 建立時間
+### `users` (使用者表)
+紀錄使用者的登入資訊與密碼雜湊。
+- `id` (INTEGER): Primary Key。
+- `username` (TEXT): 使用者登入帳號，必填且唯一。
+- `password_hash` (TEXT): 經過加密的密碼，必填。
+- `created_at` (DATETIME): 帳號建立時間。
 
-### SUBJECT (科目表)
-每個使用者可以自訂多個不同科目來分類學習內容。
-- `id` (INTEGER, PK): 科目唯一 ID
-- `user_id` (INTEGER, FK): 關聯至 USER.id
-- `name` (VARCHAR(100)): 科目名稱 (例如：高中數學)
-- `description` (TEXT): 簡單描述
-- `created_at` (DATETIME): 建立時間
+### `accounts` (帳戶表)
+儲存使用者的各種資金帳戶，如現金、銀行、信用卡等。
+- `id` (INTEGER): Primary Key。
+- `user_id` (INTEGER): Foreign Key，對應 `users.id`。
+- `name` (TEXT): 帳戶名稱 (如「國泰世華」、「我的錢包」)，必填。
+- `type` (TEXT): 帳戶類型 (如 `cash`, `bank`, `credit`, `mobile_pay`)，必填。
+- `balance` (REAL): 帳戶當前餘額，預設為 0.0。
+- `currency` (TEXT): 幣別 (如 `TWD`, `USD`)，預設為 TWD。
+- `created_at` (DATETIME): 建立時間。
 
-### NOTE (筆記表)
-存放上傳的重點講義內容以及 AI 歸納出來的摘要。
-- `id` (INTEGER, PK): 筆記唯一 ID
-- `subject_id` (INTEGER, FK): 關聯至 SUBJECT.id
-- `title` (VARCHAR(150)): 筆記標題 (如檔名)
-- `original_content` (TEXT): 原始擷取的文本內容
-- `ai_summary` (TEXT): AI 解析後產生的結構化筆記
-- `created_at` (DATETIME): 建立時間
+### `categories` (收支分類表)
+紀錄花費與收入的類別。系統可提供預設值，使用者也可自定義。
+- `id` (INTEGER): Primary Key。
+- `user_id` (INTEGER): Foreign Key，對應 `users.id`。允許 NULL（代表系統預設類別）。
+- `name` (TEXT): 類別名稱 (如「餐飲」、「薪資」)，必填。
+- `type` (TEXT): 類型 (如 `income`, `expense`)，必填。
+- `icon` (TEXT): 前端顯示的圖示名稱，選填。
+- `is_default` (BOOLEAN): 是否為系統預設類別，預設為 False。
+- `created_at` (DATETIME): 建立時間。
 
-### QUIZ (測驗表)
-針對某個科目或某份筆記所產生的整份測驗紀錄。
-- `id` (INTEGER, PK): 獨一測驗 ID
-- `subject_id` (INTEGER, FK): 關聯至 SUBJECT.id
-- `note_id` (INTEGER, FK, Nullable): 若針對某筆記出題則有關聯
-- `title` (VARCHAR(150)): 測驗標題
-- `score` (INTEGER): 得分
-- `created_at` (DATETIME): 測驗時間
+### `transactions` (交易紀錄表) - 核心借貸設計
+實作會計邏輯的核心，紀錄每一筆資金流動。
+- `id` (INTEGER): Primary Key。
+- `user_id` (INTEGER): Foreign Key，對應 `users.id`。
+- `category_id` (INTEGER): Foreign Key，對應 `categories.id`。
+- `source_account_id` (INTEGER): Foreign Key，對應 `accounts.id`。資金來源帳戶 (流出)。可為 NULL (代表外部收入)。
+- `target_account_id` (INTEGER): Foreign Key，對應 `accounts.id`。資金目的帳戶 (流入)。可為 NULL (代表單純支出)。
+- `amount` (REAL): 交易金額，必填。
+- `currency` (TEXT): 幣別，預設 TWD。
+- `note` (TEXT): 備註說明，選填。
+- `transaction_date` (DATETIME): 交易發生時間，必填。
+- `receipt_image_url` (TEXT): 發票或收據圖片路徑 (未來 OCR 用)，選填。
+- `created_at` (DATETIME): 建立時間。
 
-### QUESTION_RESULT (錯題/答題紀錄表)
-紀錄每一次測驗中的各題答題狀況，作為未來**弱點分析**的主要資料來源。
-- `id` (INTEGER, PK): 唯一 ID
-- `quiz_id` (INTEGER, FK): 關聯至 QUIZ.id
-- `question_text` (TEXT): 題目內容
-- `user_answer` (VARCHAR(255)): 使用者選擇/填寫的答案
-- `correct_answer` (VARCHAR(255)): 正確答案
-- `is_correct` (BOOLEAN): 是否答對
-- `explanation` (TEXT): 題目詳解或 AI 解析
+### `budgets` (預算設定表)
+設定每月總預算或特定類別預算。
+- `id` (INTEGER): Primary Key。
+- `user_id` (INTEGER): Foreign Key，對應 `users.id`。
+- `category_id` (INTEGER): Foreign Key，對應 `categories.id`。若為 NULL 則代表「總預算」。
+- `amount` (REAL): 預算金額限制，必填。
+- `period_month` (TEXT): 適用月份 (格式如 `2026-04`)，必填。
+- `created_at` (DATETIME): 建立時間。
+
+### `savings_goals` (儲蓄目標表)
+設定存錢目標與進度。
+- `id` (INTEGER): Primary Key。
+- `user_id` (INTEGER): Foreign Key，對應 `users.id`。
+- `name` (TEXT): 目標名稱 (如「買車」、「旅遊」)，必填。
+- `target_amount` (REAL): 目標金額，必填。
+- `current_amount` (REAL): 目前已存金額，預設 0.0。
+- `deadline_date` (DATE): 預計達成日期，選填。
+- `created_at` (DATETIME): 建立時間。
